@@ -1,74 +1,105 @@
 <?php
 include "wechatAPI.php";
 $wechatAPI = new wechatAPI();
-$appId = "wx1d7b79083952c222";
-$appSecret = "bf3de1b011cf707590b7ab86ee6574a2";
+//$appId = "wx1b999a8c73c76dcf";
+//$appSecret = "54aaa16dd13d6c6cd54e0a1eb3b5a81c";
+$appId = 'wx1d7b79083952c222';
+$appSecret = 'bf3de1b011cf707590b7ab86ee6574a2';
 if (isset($_GET['echostr'])) {
     if ($wechatAPI->checkSignature()) {
         echo $_GET['echostr'];
     }
 } else {
     $input = $wechatAPI->receiveXMLData();
-    $from_user_name = $input->FromUserName;
-    $to_user_name = $input->ToUserName;
-    $access_token = $wechatAPI->get_access_token($appId, $appSecret);
-    $menu=get_menu();
-    $wechatAPI->delete_menu($access_token);
-    $wechatAPI->set_menu($access_token,$menu);
+    $fromUserName = $input->FromUserName;
+    $toUserName = $input->ToUserName;
+//    $accessToken = $wechatAPI->get_access_token($appId, $appSecret);
+//    $menu = getMenu();
+//    $wechatAPI->delete_menu($accessToken);
+//    $wechatAPI->set_menu($accessToken, $menu);
     if ($input->MsgType == 'text') {
         $content = $input->Content;
-        $wechatAPI->sendText($from_user_name, $to_user_name, "auto text reply!");
+        $wechatAPI->sendText($fromUserName, $toUserName, "auto text reply!");
+    }
+    if ($input->MsgType == 'event') {
+        $key = $input->EventKey;
+        //打卡功能
+        if ($key == 'clock_in') {
+            $today=date("Y年m月d日", time());
+            $days = getDays();
+            $motto = getMotto();
+            $msg = "打卡成功!\n今天是".$today.",距离考研还有" . $days . "天。\n今日格言:" . $motto;
+            $wechatAPI->sendText($fromUserName, $toUserName, $msg);
+        } else {
+            $wechatAPI->sendText($fromUserName, $toUserName, $key);
+        }
     }
 }
-function get_menu()
+function getMenu()
 {
-    return '{  
-     "button":[  
-      {      
-               "type":"view",  
-               "name":"精选课程",  
-               "url":"https://w.url.cn/s/ASOsHnk"  
-      },
-      {  
-           "name":"优研优选",  
-           "sub_button":[  
-            {      
-               "type":"click",  
-               "name":"院校&导师",  
-               "key":"SCHOOCL_TEACHER"  
-            },  
-            {  
-               "type":"view",  
-               "name":"快速登录",  
-               "url":"http://www.uyanuxuan.com/index.php"  
-            },  
-            {  
-               "type":"view",  
-               "name":"导师计划",  
-               "url":"http://www.uyanuxuan.com/index.php/Home/About/xsjh.html"  
-            }]  
-       },  
-        {  
-           "name":"我的",  
-           "sub_button":[  
-            {      
-               "type":"click",  
-               "name":"联系我们",  
-               "key":"CONTACTUS"  
-            },  
-            {  
-               "type":"view",  
-               "name":"正版软件",  
-               "url":"http://www.xmypage.com/model2_37685.html"  
-            },  
-            {  
-               "type":"view",  
-               "name":"四六级冲刺",  
-               "url":"https://h5.youyinian.cn/"  
-            }]  
-        }        
-       ]  
- }';
+    return '{
+      "button":[
+      {
+           "name":"找学校",
+           "sub_button":[
+            {
+               "type":"click",
+                "name":"专业信息",
+                "key":"major"
+            },
+            {
+               "type":"click",
+                "name":"考纲查询",
+                "key":"outline"
+            },
+            {
+               "type":"click",
+                "name":"分数线查询",
+                "key":"score"
+            }]
+       },
+       {
+           "name":"干货分享",
+           "sub_button":[
+            {
+               "type":"click",
+                "name":"课程资料",
+                "key":"course"
+            },
+            {
+               "type":"click",
+                "name":"真题下载",
+                "key":"download"
+            },
+            {
+               "type":"click",
+                "name":"经验分享",
+                "key":"experience"
+            }]
+       },
+       {
+           "name":"一起上岸",
+           "sub_button":[
+            {
+               "type":"click",
+                "name":"每日打卡",
+                "key":"clock_in"
+            },
+            {
+               "type":"click",
+                "name":"房间学习",
+                "key":"room"
+            }]
+       }]
+}';
 }
-
+function getDays(){
+    date_default_timezone_set('PRC');
+    $startTime=strtotime(date("Y-m-d"));
+    $endTime=strtotime("2021-12-26");
+    return round(($endTime-$startTime)/3600/24);
+}
+function getMotto(){
+    return "不要觉得树会在冬天死去,你总会遇到更加强大的自己。";
+}
 ?>
