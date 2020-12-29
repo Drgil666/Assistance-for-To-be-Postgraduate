@@ -86,9 +86,9 @@ function getMenu()
                 "key":"clock_in"
             },
             {
-               "type":"click",
+               "type":"view",
                 "name":"房间学习",
-                "key":"room"
+                "url":"http://mp.weixin.qq.com/s?__biz=MzkyMzE2NjQ1Mw==&mid=100000002&idx=1&sn=8e52777516516b89077758ec537a8f6a&chksm=41e87298769ffb8e4b4ac0a46755359678dfa923182b8f920805d83adff990bd9eae95fcef83&mpshare=1&scene=23&srcid=1229p9l2cC8EcDE7MaeQjwiT&sharer_sharetime=1609212049366&sharer_shareid=2736de8c30a0af4281b64fd4767e723a#rd"
             }]
        }]
 }';
